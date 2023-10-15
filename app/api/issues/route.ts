@@ -4,16 +4,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const validation = createIssueSchema.safeParse(body);
+    const { values } = await req.json();
+    const validation = createIssueSchema.safeParse(values);
 
     if (!validation.success)
       return NextResponse.json(validation.error.format(), { status: 400 });
 
     const newIssue = await db.issue.create({
       data: {
-        title: body.title,
-        description: body.description,
+        title: values.title,
+        description: values.description,
       },
     });
 
