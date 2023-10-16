@@ -1,9 +1,15 @@
-import { issueSchema } from "@/app/validationSchemas";
-import db from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+
+import db from "@/lib/db";
+import authOptions from "../auth/AuthOptions";
+import { issueSchema } from "@/app/validationSchemas";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json("Unauthorized", { status: 401 });
+
     const { values } = await req.json();
     const validation = issueSchema.safeParse(values);
 

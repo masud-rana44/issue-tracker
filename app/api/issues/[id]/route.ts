@@ -2,11 +2,17 @@ import { issueSchema } from "@/app/validationSchemas";
 import db from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
+import { getServerSession } from "next-auth";
+import authOptions from "../../auth/AuthOptions";
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json("Unauthorized", { status: 401 });
+
     const values = await req.json();
     const validation = issueSchema.safeParse(values);
 
@@ -44,6 +50,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json("Unauthorized", { status: 401 });
+
     const issue = await db.issue.findUnique({
       where: {
         id: parseInt(params.id),
