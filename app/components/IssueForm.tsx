@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 
 import { Button, Callout, TextField } from "@radix-ui/themes";
-import { createIssueSchema } from "@/app/validationSchemas";
+import { issueSchema } from "@/app/validationSchemas";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
 import { Spinner } from "@/app/components/Spinner";
 import dynamic from "next/dynamic";
@@ -19,7 +19,7 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
 
-type IssueForm = z.infer<typeof createIssueSchema>;
+type IssueForm = z.infer<typeof issueSchema>;
 
 export const IssueForm = ({ issue }: { issue?: Issue }) => {
   const router = useRouter();
@@ -29,7 +29,11 @@ export const IssueForm = ({ issue }: { issue?: Issue }) => {
     control,
     formState: { errors, isSubmitting },
   } = useForm<IssueForm>({
-    resolver: zodResolver(createIssueSchema),
+    resolver: zodResolver(issueSchema),
+    defaultValues: {
+      title: issue?.title || "",
+      description: issue?.description || "",
+    },
   });
   const [error, setError] = useState("");
 
