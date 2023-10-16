@@ -1,6 +1,7 @@
 import db from "@/lib/db";
 import { Button, Table } from "@radix-ui/themes";
 import Link from "next/link";
+import { IssueStatusBadge } from "../components/IssueStatusBadge";
 
 const IssuesPage = async () => {
   const issues = await db.issue.findMany();
@@ -28,9 +29,14 @@ const IssuesPage = async () => {
         <Table.Body>
           {issues.map((issue) => (
             <Table.Row key={issue.id}>
-              <Table.RowHeaderCell>{issue.title}</Table.RowHeaderCell>
+              <Table.RowHeaderCell className="flex gap-4 items-center">
+                {issue.title}
+                <div className="block md:hidden">
+                  <IssueStatusBadge status={issue.status} />
+                </div>
+              </Table.RowHeaderCell>
               <Table.Cell className="hidden md:table-cell">
-                {issue.status}
+                <IssueStatusBadge status={issue.status} />
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
                 {issue.createdAt.toDateString()}
