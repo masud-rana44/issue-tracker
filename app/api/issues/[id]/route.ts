@@ -7,7 +7,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { values } = await req.json();
+    const values = await req.json();
     const validation = issueSchema.safeParse(values);
 
     if (!validation.success)
@@ -35,6 +35,33 @@ export async function PATCH(
     return NextResponse.json(updatedIssue, { status: 200 });
   } catch (error) {
     console.log("[ISSUES_PATCH]: " + error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const issue = await db.issue.findUnique({
+      where: {
+        id: parseInt(params.id),
+      },
+    });
+
+    if (!issue)
+      return NextResponse.json({ error: "Invalid issue" }, { status: 404 });
+
+    await db.issue.delete({
+      where: {
+        id: issue.id,
+      },
+    });
+
+    return NextResponse.json({});
+  } catch (error) {
+    console.log("[ISSUES_DELETE]: " + error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
