@@ -12,6 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Button, Callout, TextField } from "@radix-ui/themes";
 import { createIssueSchema } from "@/app/validationSchemas";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
+import { Spinner } from "@/app/components/Spinner";
 
 type IssueForm = z.infer<typeof createIssueSchema>;
 
@@ -21,7 +22,7 @@ const NewIssuePage = () => {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IssueForm>({
     resolver: zodResolver(createIssueSchema),
   });
@@ -30,11 +31,9 @@ const NewIssuePage = () => {
   const onSubmit = handleSubmit(async (values: IssueForm) => {
     try {
       setError("");
-
       await axios.post("/api/issues", {
         values,
       });
-
       router.push("/issues");
     } catch (error) {
       setError("An unexpected error occurred.");
@@ -61,7 +60,9 @@ const NewIssuePage = () => {
           )}
         />
         <ErrorMessage>{errors.description?.message}</ErrorMessage>
-        <Button>Submit New Issue</Button>
+        <Button disabled={isSubmitting} className="cursor-pointer">
+          Submit New Issue{isSubmitting && <Spinner />}
+        </Button>
       </form>
     </div>
   );
